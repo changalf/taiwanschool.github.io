@@ -1,0 +1,124 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taiwanschool - 台語教學首頁</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        .hero-bg {
+            background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- 導航欄 -->
+    <nav class="bg-white shadow-md">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-2xl font-bold text-blue-600">Taiwanschool</div>
+            <div class="space-x-6">
+                <a href="#" class="text-gray-700 hover:text-blue-600">首頁</a>
+                <a href="#" class="text-gray-700 hover:text-blue-600">課程</a>
+                <a href="#" class="text-gray-700 hover:text-blue-600">關於我們</a>
+                <a href="#" class="text-gray-700 hover:text-blue-600">聯繫</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 首頁主視覺 -->
+    <section class="hero-bg h-96 flex items-center justify-center text-white">
+        <div class="text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">學台語，愛台灣</h1>
+            <p class="text-lg md:text-xl mb-6">輕鬆有趣的台語學習平台，帶你深入台灣文化！</p>
+            <a href="#" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-300">立即開始學習</a>
+        </div>
+    </section>
+
+    <!-- 特色介紹 -->
+    <section class="container mx-auto px-6 py-12">
+        <h2 class="text-3xl font-bold text-center mb-12">為什麼選擇 Taiwanschool？</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                <img src="https://images.unsplash.com/photo-1516321310762-959200e7c8a2" alt="互動課程" class="h-32 mx-auto mb-4 rounded">
+                <h3 class="text-xl font-semibold mb-2">互動課程</h3>
+                <p class="text-gray-600">透過遊戲化學習和實境對話，快速掌握台語日常用語。</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                <img src="https://images.unsplash.com/photo-1522202176988-66273c2b6e3c" alt="文化體驗" class="h-32 mx-auto mb-4 rounded">
+                <h3 class="text-xl font-semibold mb-2">文化體驗</h3>
+                <p class="text-gray-600">結合台灣在地文化，讓你邊學語言邊了解風土民情。</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                <img src="https://images.unsplash.com/photo-1516321497487-e288fb19713f" alt="靈活學習" class="h-32 mx-auto mb-4 rounded">
+                <h3 class="text-xl font-semibold mb-2">靈活學習</h3>
+                <p class="text-gray-600">隨時隨地學習，支援手機、平板與電腦多平台。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 呼籲行動 -->
+    <section class="bg-blue-600 text-white py-12">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-3xl font-bold mb-4">準備好學習台語了嗎？</h2>
+            <p class="text-lg mb-6">加入我們的學習社群，開啟你的台語學習之旅！</p>
+            <a href="#" class="bg-white text-blue-600 hover:bg-gray-100 font-semibold py-3 px-6 rounded-lg transition duration-300">立即註冊</a>
+        </div>
+    </section>
+
+    <!-- 頁尾 -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p class="mb-4">© 2025 Taiwanschool. 版權所有。</p>
+            <div class="space-x-4">
+                <a href="#" class="hover:text-blue-400">隱私政策</a>
+                <a href="#" class="hover:text-blue-400">使用條款</a>
+                <a href="#" class="hover:text-blue-400">聯繫我們</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
